@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: #fff;
+            padding: 10px 20px;
+            border-bottom: 1px solid #dadce0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #3c4043;
+            font-size: 20px;
+            font-weight: 400;
+        }
+        
+        .iframe-container {
+            flex: 1;
+            position: relative;
+            background-color: #fff;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #5f6368;
+            font-size: 16px;
+        }
+        
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #d93025;
+            font-size: 16px;
+            display: none;
+        }
+        
+        .error-message p {
+            margin-bottom: 10px;
+        }
+        
+        .error-message a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+        
+        .error-message a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 8px 16px;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>My Spreadsheet</h1>
+        </div>
+        
+        <div class="iframe-container">
+            <div class="loading" id="loading">Loading spreadsheet...</div>
+            
+            <div class="error-message" id="error">
+                <p>Unable to load the spreadsheet.</p>
+                <p>This may be due to sharing permissions or iframe restrictions.</p>
+                <a href="#" id="direct-link" target="_blank">Open spreadsheet directly</a>
+            </div>
+            
+            <iframe 
+                id="doc-iframe"
+                src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTW586rNxio60J9w_JIriL8k-jAzr-q1AWA5y5COCltfv0ED89uCjjgqtY76TnGMpkHSZj6Y-L2Fn9k/pubhtml?widget=true&headers=false"
+                title="Google Spreadsheet"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+    
+    <script>
+        // Your Google Sheets published URL
+        const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTW586rNxio60J9w_JIriL8k-jAzr-q1AWA5y5COCltfv0ED89uCjjgqtY76TnGMpkHSZj6Y-L2Fn9k/pubhtml?widget=true&headers=false';
+        
+        const iframe = document.getElementById('doc-iframe');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const directLink = document.getElementById('direct-link');
+        
+        // Set the actual URL
+        iframe.src = GOOGLE_SHEET_URL;
+        directLink.href = GOOGLE_SHEET_URL;
+        
+        // Handle iframe load
+        iframe.onload = function() {
+            loading.style.display = 'none';
+        };
+        
+        // Handle iframe error
+        iframe.onerror = function() {
+            loading.style.display = 'none';
+            error.style.display = 'block';
+        };
+        
+        // Fallback timeout
+        setTimeout(() => {
+            if (loading.style.display !== 'none') {
+                loading.style.display = 'none';
+                error.style.display = 'block';
+            }
+        }, 10000);
+        
+        // Handle cases where iframe is blocked
+        window.addEventListener('message', function(event) {
+            if (event.data === 'iframe-blocked') {
+                loading.style.display = 'none';
+                error.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
